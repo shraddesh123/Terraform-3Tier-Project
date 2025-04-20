@@ -8,34 +8,54 @@ resource "aws_vpc" "Main_VPC" {
 
 # Creating 6 Subnets (2 Public and 4 Private )
 #public
-resource "aws_subnet" "PUBLIC_SUBNET_1" {
+resource "aws_subnet" "public_subnet_1" {
   vpc_id                  = aws_vpc.Main_VPC.id
   cidr_block              = var.public_subnet_1_cidrblock
-  availability_zone       = var.public_subnet_1_az
+  availability_zone       = var.az1
   map_public_ip_on_launch = true
   tags = {
     Name = "public-subnet-1"
   }
 }
-resource "aws_subnet" "PUBLIC_SUBNET_2" {
+resource "aws_subnet" "public_subnet_2" {
   vpc_id                  = aws_vpc.Main_VPC.id
   cidr_block              = var.public_subnet_2_cidrblock
-  availability_zone       = var.public_subnet_1_az
+  availability_zone       = var.az2
   map_public_ip_on_launch = true
   tags = {
     Name = "public-subnet-2"
   }
 }
 #private
-resource "aws_subnet" "name" {
-  vpc_id = aws_vpc.Main_VPC.id
+resource "aws_subnet" "private_subnet_1" {
+  vpc_id            = aws_vpc.Main_VPC.id
+  cidr_block        = var.app_private_subnet1_cidr
+  availability_zone = var.az1
+  tags = {
+    Name = "private-subnet-1"
+  }
 }
-resource "aws_subnet" "name" {
-  vpc_id = aws_vpc.Main_VPC.id
+resource "aws_subnet" "private_subnet_2" {
+  vpc_id            = aws_vpc.Main_VPC.id
+  cidr_block        = var.app_private_subnet2_cidr
+  availability_zone = var.az2
+  tags = {
+    Name = "private-subnet-2"
+  }
 }
-resource "aws_subnet" "name" {
-  vpc_id = aws_vpc.Main_VPC.id
+resource "aws_subnet" "db_private_subnet_1" {
+  vpc_id            = aws_vpc.Main_VPC.id
+  cidr_block        = var.DB_private_subnet1_cidr
+  availability_zone = var.az1
+  tags = {
+    Name = "db-private-subnet-1"
+  }
 }
-resource "aws_subnet" "name" {
-  vpc_id = aws_vpc.Main_VPC.id
+resource "aws_subnet" "db_private_subnet_2" {
+  vpc_id            = aws_vpc.Main_VPC.id
+  cidr_block        = var.DB_private_subnet2_cidr
+  availability_zone = var.az2
+  tags = {
+    Name = "db-private-subnet-2"
+  }
 }

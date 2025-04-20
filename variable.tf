@@ -11,9 +11,21 @@ variable "public_subnet_1_cidrblock" {
 variable "public_subnet_2_cidrblock" {
   type = string
 }
-variable "public_subnet_1_az" {
+variable "az1" {
   type = string
 }
-variable "public_subnet_2_az" {
+variable "az2" {
+  type = string
+}
+variable "app_private_subnet1_cidr" {
+  type = string
+}
+variable "app_private_subnet2_cidr" {
+  type = string
+}
+variable "DB_private_subnet1_cidr" {
+  type = string
+}
+variable "DB_private_subnet2_cidr" {
   type = string
 }

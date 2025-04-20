@@ -11,9 +11,8 @@ crash.log
 # Exclude backup files
 *.backup
 
-# Terraform variable files (often contain secrets)
-*.tfvars
-*.tfvars.json
+
+
 
 # Override files (local changes)
 override.tf
