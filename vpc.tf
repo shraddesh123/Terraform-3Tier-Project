@@ -26,6 +26,7 @@ resource "aws_subnet" "public_subnet_2" {
     Name = "public-subnet-2"
   }
 }
+
 #private
 resource "aws_subnet" "private_subnet_1" {
   vpc_id            = aws_vpc.Main_VPC.id
@@ -58,4 +59,39 @@ resource "aws_subnet" "db_private_subnet_2" {
   tags = {
     Name = "db-private-subnet-2"
   }
+}
+
+#Internet-Gateway creation
+resource "aws_internet_gateway" "Main-IGW" {
+  vpc_id = aws_vpc.Main_VPC.id
+  tags = {
+    Name = "Main-IGW"
+  }
+}
+
+#NAT Gateway creation
+#creating 2 EIP for NAT Gateway
+resource "aws_eip" "eip1" {
+  domain = "vpc"
+}
+resource "aws_eip" "eip2" {
+  domain = "vpc"
+}
+
+#NAT Gateway
+resource "aws_nat_gateway" "NAT1" {
+  allocation_id = aws_eip.eip1.id
+  subnet_id     = aws_subnet.public_subnet_1.id
+  tags = {
+    Name = "Nat-gateway-1"
+  }
+  depends_on = [aws_internet_gateway.Main-IGW]
+}
+resource "aws_nat_gateway" "NAT2" {
+  allocation_id = aws_eip.eip2.id
+  subnet_id     = aws_subnet.public_subnet_2.id
+  tags = {
+    Name = "Nat-gateway-2"
+  }
+  depends_on = [aws_internet_gateway.Main-IGW]
 }
