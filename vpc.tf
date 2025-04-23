@@ -95,3 +95,57 @@ resource "aws_nat_gateway" "NAT2" {
   }
   depends_on = [aws_internet_gateway.Main-IGW]
 }
+
+#creating 3 route table (1 public 2 private)
+#public route-table
+resource "aws_route_table" "public_RT" {
+  vpc_id = aws_vpc.Main_VPC.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.Main-IGW.id
+  }
+  tags = {
+    Name = "public_RT"
+  }
+}
+#public-subnet association
+resource "aws_route_table_association" "public_subnet_1_association" {
+  route_table_id = aws_route_table.public_RT.id
+  subnet_id      = aws_subnet.public_subnet_1.id
+}
+resource "aws_route_table_association" "public_subnet_2_association" {
+  route_table_id = aws_route_table.public_RT.id
+  subnet_id      = aws_subnet.public_subnet_2.id
+}
+#private route-table for AZ1
+resource "aws_route_table" "private_RT1" {
+  vpc_id = aws_vpc.Main_VPC.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_nat_gateway.NAT1.id
+  }
+  tags = {
+    Name = "private_RT_AZ1"
+  }
+}
+#private-subnet1 association
+resource "aws_route_table_association" "private_subnet1_association" {
+  route_table_id = aws_route_table.private_RT1.id
+  subnet_id      = aws_subnet.private_subnet_1.id
+}
+#private route-table for AZ2
+resource "aws_route_table" "private_RT2" {
+  vpc_id = aws_vpc.Main_VPC.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_nat_gateway.NAT2.id
+  }
+  tags = {
+    Name = "private_RT_AZ2"
+  }
+}
+#private-subnet2 association
+resource "aws_route_table_association" "private_subnet2_association" {
+  route_table_id = aws_route_table.private_RT2.id
+  subnet_id      = aws_subnet.private_subnet_2.id
+}
