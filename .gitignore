@@ -26,3 +26,6 @@ terraform.rc
 
 # Lock file (optional – keep if you're sharing dependencies)
 .terraform.lock.hcl
+
+# Local documentation
+docs.txt
