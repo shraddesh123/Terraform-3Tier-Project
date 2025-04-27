@@ -29,3 +29,6 @@ variable "DB_private_subnet1_cidr" {
 variable "DB_private_subnet2_cidr" {
   type = string
 }
+variable "My_IP" {
+  type = string
+}

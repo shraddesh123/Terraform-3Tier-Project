@@ -149,3 +149,62 @@ resource "aws_route_table_association" "private_subnet2_association" {
   route_table_id = aws_route_table.private_RT2.id
   subnet_id      = aws_subnet.private_subnet_2.id
 }
+
+#Creating Security-Groups On Each layer
+#Internet-facing LB Security-Group
+
+resource "aws_security_group" "Internet-facing-LB-SG" {
+  vpc_id = aws_vpc.Main_VPC.id
+  tags = {
+    Name = "Internet-facing-LB-SG"
+  }
+}
+#Ingress rule
+resource "aws_vpc_security_group_ingress_rule" "HTTP" {
+  security_group_id = aws_security_group.Internet-facing-LB-SG.id
+  ip_protocol       = "tcp"
+  from_port         = 80
+  to_port           = 80
+  cidr_ipv4         = "0.0.0.0/0"
+}
+#Egress rule
+resource "aws_vpc_security_group_egress_rule" "ALL-TRAFFIC" {
+  security_group_id = aws_security_group.Internet-facing-LB-SG.id
+  ip_protocol       = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
+}
+
+#Public Security-Group
+resource "aws_security_group" "Public-SG" {
+  vpc_id = aws_vpc.Main_VPC.id
+  tags = {
+    Name = "Public-SG"
+  }
+}
+#Ingress rule 1&2
+resource "aws_security_group_rule" "Public-Ingress-Rule-1" {
+  security_group_id        = aws_security_group.Public-SG.id
+  type                     = "ingress"
+  protocol                 = "tcp"
+  from_port                = 80
+  to_port                  = 80
+  source_security_group_id = aws_security_group.Internet-facing-LB-SG.id
+}
+resource "aws_security_group_rule" "Public-Ingress-Rule-2" {
+  security_group_id = aws_security_group.Public-SG.id
+  protocol          = "tcp"
+  from_port         = 80
+  to_port           = 80
+  type              = "ingress"
+  cidr_blocks       = [var.My_IP]
+}
+#Egress rule
+resource "aws_security_group_rule" "Public-Egress_Rule" {
+  security_group_id = aws_security_group.Public-SG.id
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+
+}
