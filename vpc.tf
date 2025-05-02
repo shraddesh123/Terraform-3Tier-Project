@@ -272,15 +272,16 @@ resource "aws_security_group" "db-sg" {
   }
 }
 resource "aws_security_group_rule" "db-sg-ingress" {
-  security_group_id = aws_security_group.db-sg.id
-  type              = "ingress"
-  protocol          = "tcp"
-  from_port         = 3306
-  to_port           = 3306
+  security_group_id        = aws_security_group.db-sg.id
+  type                     = "ingress"
+  protocol                 = "tcp"
+  from_port                = 3306
+  to_port                  = 3306
+  source_security_group_id = aws_security_group.Private-instance-SG.id
 }
 resource "aws_security_group_rule" "db-sg-egress" {
   security_group_id = aws_security_group.db-sg.id
-  type              = "-1"
+  type              = "egress"
   protocol          = "-1"
   from_port         = 0
   to_port           = 0
