@@ -174,7 +174,7 @@ resource "aws_vpc_security_group_egress_rule" "ALL-TRAFFIC" {
   cidr_ipv4         = "0.0.0.0/0"
 }
 
-#Public Security-Group
+#Public Instance Security-Group
 resource "aws_security_group" "Public-SG" {
   vpc_id = aws_vpc.Main_VPC.id
   tags = {
@@ -192,19 +192,97 @@ resource "aws_security_group_rule" "Public-Ingress-Rule-1" {
 }
 resource "aws_security_group_rule" "Public-Ingress-Rule-2" {
   security_group_id = aws_security_group.Public-SG.id
+  type              = "ingress"
   protocol          = "tcp"
   from_port         = 80
   to_port           = 80
-  type              = "ingress"
   cidr_blocks       = [var.My_IP]
 }
 #Egress rule
 resource "aws_security_group_rule" "Public-Egress_Rule" {
   security_group_id = aws_security_group.Public-SG.id
   type              = "egress"
+  protocol          = "-1"
   from_port         = 0
   to_port           = 0
-  protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
 
+}
+
+#Second load-balancer SG(INternal LB)
+resource "aws_security_group" "Internal-LB-SG" {
+  vpc_id = aws_vpc.Main_VPC.id
+  tags = {
+    Name = "Internal-LB-SG"
+  }
+}
+resource "aws_security_group_rule" "Internal-LB-SG-ingress" {
+  security_group_id        = aws_security_group.Internal-LB-SG.id
+  type                     = "ingress"
+  protocol                 = "tcp"
+  from_port                = 80
+  to_port                  = 80
+  source_security_group_id = aws_security_group.Public-SG.id
+}
+resource "aws_security_group_rule" "Internal-LB-SG-egress" {
+  security_group_id = aws_security_group.Internal-LB-SG.id
+  type              = "egress"
+  protocol          = "-1"
+  from_port         = 0
+  to_port           = 0
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+#private Instance Security-Group
+resource "aws_security_group" "Private-instance-SG" {
+  vpc_id = aws_vpc.Main_VPC.id
+  tags = {
+    Name = "Private-instance-SG"
+  }
+}
+resource "aws_security_group_rule" "private-instance-sg-ingress-rule1" {
+  security_group_id        = aws_security_group.Private-instance-SG.id
+  type                     = "ingress"
+  protocol                 = "tcp"
+  from_port                = 4000
+  to_port                  = 4000 // Backend app supoorts port 4000
+  source_security_group_id = aws_security_group.Internal-LB-SG.id
+}
+resource "aws_security_group_rule" "private-instance-sg-ingress-rule2" {
+  security_group_id = aws_security_group.Private-instance-SG.id
+  type              = "ingress"
+  protocol          = "tcp"
+  from_port         = 4000
+  to_port           = 4000 // Backend app supoorts port 4000
+  cidr_blocks       = [var.My_IP]
+}
+resource "aws_security_group_rule" "private-instance-sg-egress-rule" {
+  security_group_id = aws_security_group.Private-instance-SG.id
+  type              = "egress"
+  protocol          = "-1"
+  from_port         = 0
+  to_port           = 0
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+#database security group
+resource "aws_security_group" "db-sg" {
+  vpc_id = aws_vpc.Main_VPC.id
+  tags = {
+    name = "DB-SG"
+  }
+}
+resource "aws_security_group_rule" "db-sg-ingress" {
+  security_group_id = aws_security_group.db-sg.id
+  type              = "ingress"
+  protocol          = "tcp"
+  from_port         = 3306
+  to_port           = 3306
+}
+resource "aws_security_group_rule" "db-sg-egress" {
+  security_group_id = aws_security_group.db-sg.id
+  type              = "-1"
+  protocol          = "-1"
+  from_port         = 0
+  to_port           = 0
+  cidr_blocks       = ["0.0.0.0/0"]
 }
